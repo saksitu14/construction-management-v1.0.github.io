@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ConstructPro — Construction Management + SkyCiv Structural Analysis</title>
+<link rel="stylesheet" href="css/style.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+<div class="layout">
+
+  <aside class="sidebar no-print">
+    <div class="brand">
+      <span class="brand-icon">🏗️</span>
+      <div>
+        <div class="brand-name">ConstructPro</div>
+        <div class="brand-sub" data-i18n="brandSub"></div>
+      </div>
+    </div>
+    <nav id="nav">
+      <a href="#dashboard"  class="nav-link" data-page="dashboard"><span>📊</span><span data-i18n="navDashboard"></span></a>
+      <a href="#projects"   class="nav-link" data-page="projects"><span>📁</span><span data-i18n="navProjects"></span></a>
+      <a href="#wbs"        class="nav-link" data-page="wbs"><span>🗂️</span><span data-i18n="navWbs"></span></a>
+      <a href="#gantt"      class="nav-link" data-page="gantt"><span>📅</span><span data-i18n="navGantt"></span></a>
+      <a href="#resources"  class="nav-link" data-page="resources"><span>👷</span><span data-i18n="navResources"></span></a>
+      <a href="#budget"     class="nav-link" data-page="budget"><span>💰</span><span data-i18n="navBudget"></span></a>
+      <a href="#structural" class="nav-link" data-page="structural"><span>🏛️</span><span data-i18n="navStructural"></span></a>
+      <a href="#reports"    class="nav-link" data-page="reports"><span>📄</span><span data-i18n="navReports"></span></a>
+      <a href="#settings"   class="nav-link" data-page="settings"><span>⚙️</span><span data-i18n="navSettings"></span></a>
+    </nav>
+    <div class="sidebar-foot">
+      <span id="modeBadge" class="badge"></span>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar no-print">
+      <h1 id="pageTitle"></h1>
+      <div class="topbar-right">
+        <button id="langToggle" class="btn btn-ghost" title="Switch language">EN</button>
+      </div>
+    </header>
+
+    <div class="content" id="content">
+
+      <!-- ============ DASHBOARD ============ -->
+      <section class="page" id="page-dashboard">
+        <div class="kpi-row" id="dashKpis"></div>
+        <div class="grid-2">
+          <div class="card"><h3 data-i18n="chartBudgetVsActual"></h3><div class="chart-box"><canvas id="chBudget"></canvas></div></div>
+          <div class="card"><h3 data-i18n="chartProgress"></h3><div class="chart-box"><canvas id="chProgress"></canvas></div></div>
+        </div>
+        <div class="grid-2">
+          <div class="card"><h3 data-i18n="chartSCurve"></h3><div class="chart-box"><canvas id="chSCurve"></canvas></div></div>
+          <div class="card"><h3 data-i18n="chartResource"></h3><div class="chart-box"><canvas id="chResource"></canvas></div></div>
+        </div>
+      </section>
+
+      <!-- ============ PROJECTS ============ -->
+      <section class="page" id="page-projects">
+        <div class="toolbar">
+          <input id="projSearch" class="input" data-i18n-ph="searchProjects">
+          <span class="spacer"></span>
+          <button id="btnAddProject" class="btn btn-primary">＋ <span data-i18n="addProject"></span></button>
+        </div>
+        <div class="card table-card">
+          <table class="table" id="projectsTable"><thead></thead><tbody></tbody></table>
+        </div>
+      </section>
+
+      <!-- ============ WBS ============ -->
+      <section class="page" id="page-wbs">
+        <div class="toolbar"><select id="wbsProject" class="input"></select></div>
+        <div class="card" id="wbsTree"></div>
+      </section>
+
+      <!-- ============ GANTT ============ -->
+      <section class="page" id="page-gantt">
+        <div class="toolbar">
+          <select id="ganttProject" class="input"></select>
+          <label class="chk"><input type="checkbox" id="chkCritical" checked> <span data-i18n="showCritical"></span></label>
+          <span class="spacer"></span>
+          <button id="btnAddTask" class="btn btn-primary">＋ <span data-i18n="addTask"></span></button>
+        </div>
+        <div class="card gantt-card" id="ganttChart"></div>
+        <div class="card table-card">
+          <table class="table" id="taskTable"><thead></thead><tbody></tbody></table>
+        </div>
+      </section>
+
+      <!-- ============ RESOURCES ============ -->
+      <section class="page" id="page-resources">
+        <div class="toolbar">
+          <span class="spacer"></span>
+          <button id="btnAddResource" class="btn btn-primary">＋ <span data-i18n="addResource"></span></button>
+        </div>
+        <div class="card table-card">
+          <table class="table" id="resourceTable"><thead></thead><tbody></tbody></table>
+        </div>
+      </section>
+
+      <!-- ============ BUDGET / EVM ============ -->
+      <section class="page" id="page-budget">
+        <div class="toolbar"><select id="evmProject" class="input"></select></div>
+        <div class="kpi-row" id="evmKpis"></div>
+        <div class="grid-2">
+          <div class="card"><h3 data-i18n="evmCurve"></h3><div class="chart-box lg"><canvas id="chEvm"></canvas></div></div>
+          <div class="card"><h3 data-i18n="evmByTask"></h3><div class="table-scroll"><table class="table" id="evmTaskTable"><thead></thead><tbody></tbody></table></div></div>
+        </div>
+      </section>
+
+      <!-- ============ STRUCTURAL ============ -->
+      <section class="page" id="page-structural">
+        <div class="toolbar">
+          <select id="modelSelect" class="input"></select>
+          <button id="btnNewModel" class="btn" data-i18n="newModel"></button>
+          <button id="btnSaveModel" class="btn" data-i18n="saveModel"></button>
+          <span class="spacer"></span>
+          <span id="analyzeStatus" class="muted small"></span>
+          <button id="btnAnalyze" class="btn btn-primary">▶ <span data-i18n="analyze"></span></button>
+        </div>
+        <div class="grid-struct">
+          <div class="card struct-editor">
+            <div class="tabs" id="structTabs">
+              <button data-tab="nodes"    class="tab active" data-i18n="nodes"></button>
+              <button data-tab="members"  class="tab" data-i18n="members"></button>
+              <button data-tab="supports" class="tab" data-i18n="supports"></button>
+              <button data-tab="loads"    class="tab" data-i18n="loads"></button>
+            </div>
+            <div id="structEditorBody"></div>
+          </div>
+          <div class="card struct-view">
+            <div class="tabs" id="viewToggle">
+              <button class="tab active" data-view="model"  data-i18n="viewModel"></button>
+              <button class="tab" data-view="axial" data-i18n="viewAxial"></button>
+              <button class="tab" data-view="sfd"   data-i18n="viewSFD"></button>
+              <button class="tab" data-view="bmd"   data-i18n="viewBMD"></button>
+              <button class="tab" data-view="defl"  data-i18n="viewDefl"></button>
+              <button class="tab" data-view="react" data-i18n="viewReactions"></button>
+            </div>
+            <div id="structSvg" class="svg-box"></div>
+            <div id="structLegend" class="muted small"></div>
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="card"><h3 data-i18n="resultsTitle"></h3><div id="resultTables" class="table-scroll"></div></div>
+          <div class="card">
+            <h3 data-i18n="designCheck"></h3>
+            <div class="toolbar-inline">
+              <label data-i18n="designCode"></label>
+              <select id="designCode" class="input sm">
+                <option value="aisc">AISC 360-22 (LRFD)</option>
+                <option value="aci" disabled>ACI 318-19 — Phase 2</option>
+                <option value="ec3" disabled>Eurocode EC3 — Phase 3</option>
+              </select>
+            </div>
+            <div class="table-scroll"><table class="table" id="designTable"><thead></thead><tbody></tbody></table></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ REPORTS ============ -->
+      <section class="page" id="page-reports">
+        <div class="toolbar no-print">
+          <select id="reportProject" class="input"></select>
+          <span class="spacer"></span>
+          <button id="btnPrint" class="btn btn-primary">🖨 <span data-i18n="print"></span></button>
+        </div>
+        <div class="card report" id="reportBody"></div>
+      </section>
+
+      <!-- ============ SETTINGS ============ -->
+      <section class="page" id="page-settings">
+        <div class="card narrow">
+          <h3 data-i18n="settingsGeneral"></h3>
+          <label class="fld" data-i18n="language"></label>
+          <select id="setLang" class="input"><option value="th">ไทย</option><option value="en">English</option></select>
+
+          <h3 data-i18n="settingsSkyciv"></h3>
+          <label class="fld" data-i18n="apiMode"></label>
+          <div class="radio-row">
+            <label><input type="radio" name="apiMode" value="demo"> <span data-i18n="demoMode"></span></label>
+            <label><input type="radio" name="apiMode" value="api"> <span data-i18n="realApiMode"></span></label>
+          </div>
+          <label class="fld">SkyCiv Username</label>
+          <input id="setSkyUser" class="input" autocomplete="off">
+          <label class="fld">SkyCiv API Key</label>
+          <input id="setSkyKey" class="input" type="password" autocomplete="off">
+          <p class="muted small" data-i18n="apiHint"></p>
+          <div class="btn-row">
+            <button id="btnSaveSettings" class="btn btn-primary" data-i18n="save"></button>
+            <button id="btnResetData" class="btn btn-danger" data-i18n="resetData"></button>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+</div>
+
+<!-- ============ MODAL ============ -->
+<div class="modal-backdrop" id="modal" hidden>
+  <div class="modal">
+    <div class="modal-head"><h3 id="modalTitle"></h3><button class="modal-close" id="modalClose">×</button></div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-foot">
+      <button class="btn" id="modalCancel" data-i18n="cancel"></button>
+      <button class="btn btn-primary" id="modalOk" data-i18n="save"></button>
+    </div>
+  </div>
+</div>
+
+<script src="js/i18n.js"></script>
+<script src="js/store.js"></script>
+<script src="js/solver.js"></script>
+<script src="js/samples.js"></script>
+<script src="js/gantt.js"></script>
+<script src="js/evm.js"></script>
+<script src="js/structural.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

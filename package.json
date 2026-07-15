@@ -1,0 +1,17 @@
+{
+  "name": "constructpro",
+  "version": "1.0.0",
+  "description": "Construction Management Software with SkyCiv Structural Analysis Integration (senior project)",
+  "private": true,
+  "scripts": {
+    "test": "node test/solver_test.js && node test/samples_test.js && node test/smoke_test.js"
+  },
+  "devDependencies": {
+    "jsdom": "^24.0.0"
+  },
+  "dependencies": {
+    "next": "^16.2.10",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7"
+  }
+}
